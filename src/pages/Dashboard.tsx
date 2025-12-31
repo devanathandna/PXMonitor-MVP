@@ -35,7 +35,7 @@ interface ChartDataPoint {
 const Dashboard = () => {
   // Data control state
   const [dataControlState, setDataControlState] = useState<DataControlState>(dataControlStore.getState());
-  
+
   // Core metrics state
   const [metrics, setMetrics] = useState<MetricsData>({
     latency: 0,
@@ -160,11 +160,11 @@ const Dashboard = () => {
   const fetchMetrics = useCallback(async () => {
     try {
       console.log('Fetching metrics from backend...');
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-      const response = await fetch('http://localhost:3001/metrics', {
+      const response = await fetch('https://pxmonitor.onrender.com/metrics', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -213,7 +213,7 @@ const Dashboard = () => {
 
       // Update chart data
       const now = parsedMetrics.timestamp;
-      
+
       setLatencyData(prev => [
         ...prev.slice(-59),
         { timestamp: now, latency: parsedMetrics.latency, baseline: 50 }
@@ -226,9 +226,9 @@ const Dashboard = () => {
 
       setJitterData(prev => [
         ...prev.slice(-59),
-        { 
-          timestamp: now, 
-          jitter: parsedMetrics.jitter, 
+        {
+          timestamp: now,
+          jitter: parsedMetrics.jitter,
           packetLoss: parsedMetrics.packetLoss * 2 // Scale for visibility
         }
       ]);
@@ -241,7 +241,7 @@ const Dashboard = () => {
     } catch (err: any) {
       console.error('Fetch error:', err);
       setConsecutiveErrors(prev => prev + 1);
-      
+
       if (err.name === 'AbortError') {
         setFetchError('Request timeout - backend may be slow');
       } else if (err.message.includes('fetch')) {
@@ -278,13 +278,13 @@ const Dashboard = () => {
     };
 
     loadSettings();
-    
+
     // Initial fetch
     fetchMetrics();
-    
+
     // Set up polling interval
     const interval = setInterval(fetchMetrics, 3000);
-    
+
     return () => {
       clearInterval(interval);
     };
@@ -297,12 +297,12 @@ const Dashboard = () => {
         setShowNotifications(event.detail.showNotifications);
       }
     };
-    
+
     // Subscribe to data control changes
     const unsubscribeDataControl = dataControlStore.subscribe((state) => {
       setDataControlState(state);
     });
-    
+
     window.addEventListener('settingsUpdated', handleSettingsUpdate);
     return () => {
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
@@ -391,7 +391,7 @@ const Dashboard = () => {
               {fetchError || 'Unable to connect to backend'}
             </p>
             <p className="text-red-600 dark:text-red-400 text-xs">
-              Make sure the backend server is running on http://localhost:3001
+              Make sure the backend server is running on https://pxmonitor.onrender.com
             </p>
           </div>
         )}
@@ -425,26 +425,26 @@ const Dashboard = () => {
           {/* Health and Status Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <NetworkHealthGauge score={metrics.healthScore} />
-            <StatusCard 
-              title="Connection Stability" 
+            <StatusCard
+              title="Connection Stability"
               status={metrics.stability}
               description={
-                metrics.stability === "stable" 
-                  ? "Your connection is reliable and stable" 
+                metrics.stability === "stable"
+                  ? "Your connection is reliable and stable"
                   : metrics.stability === "unstable"
-                  ? "Your connection is experiencing some issues"
-                  : "Your connection has critical stability issues"
+                    ? "Your connection is experiencing some issues"
+                    : "Your connection has critical stability issues"
               }
             />
-            <StatusCard 
-              title="Network Congestion" 
+            <StatusCard
+              title="Network Congestion"
               status={metrics.congestion}
               description={
-                metrics.congestion === "stable" 
-                  ? "Network traffic is flowing smoothly" 
+                metrics.congestion === "stable"
+                  ? "Network traffic is flowing smoothly"
                   : metrics.congestion === "unstable"
-                  ? "Network traffic is moderately congested"
-                  : "Network traffic is heavily congested"
+                    ? "Network traffic is moderately congested"
+                    : "Network traffic is heavily congested"
               }
             />
           </div>
@@ -526,7 +526,7 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
-            
+
             <MultiLineChart
               title="Connection Quality Metrics"
               description="Jitter and packet loss affecting connection quality"
@@ -547,11 +547,11 @@ const Dashboard = () => {
 
       {/* Data Disabled Overlay */}
       {!dataControlState.dashboardEnabled && (
-        <DataDisabledOverlay 
-          type="dashboard" 
+        <DataDisabledOverlay
+          type="dashboard"
           onEnable={() => {
             // Refresh will happen automatically through data control store subscription
-          }} 
+          }}
         />
       )}
     </div>

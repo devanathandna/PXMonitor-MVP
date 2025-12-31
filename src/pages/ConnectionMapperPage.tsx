@@ -51,7 +51,7 @@ export default function ConnectionMapperPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [explainingHostname, setExplainingHostname] = useState<string | null>(null);
   const [explanation, setExplanation] = useState<string>("");
-  
+
   const groupedConnections = useMemo(() => {
     const groups: Record<string, GroupedConnection> = {};
     connections.forEach(conn => {
@@ -78,10 +78,10 @@ export default function ConnectionMapperPage() {
   // Transform connections for Globe component - only public IPs with valid coordinates
   const globeConnections = useMemo(() => {
     return connections
-      .filter(conn => 
-        conn.lat && 
-        conn.lng && 
-        conn.country !== 'N/A' && 
+      .filter(conn =>
+        conn.lat &&
+        conn.lng &&
+        conn.country !== 'N/A' &&
         conn.country !== 'Local'
       )
       .map(conn => ({
@@ -116,16 +116,16 @@ export default function ConnectionMapperPage() {
     const fetchConnections = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
-        const res = await fetch("http://localhost:3001/api/connections");
+        const res = await fetch("https://pxmonitor.onrender.com/api/connections");
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.statusText}`);
         }
         const data: ConnectionResponse = await res.json();
         setConnections(data.connections || []);
         setDevicePublicIP(data.devicePublicIP);
-        
+
         // Fetch device location if we have a public IP
         if (data.devicePublicIP) {
           await fetchDeviceLocation(data.devicePublicIP);
@@ -138,11 +138,11 @@ export default function ConnectionMapperPage() {
       }
     };
 
-    fetchConnections(); 
+    fetchConnections();
     const interval = setInterval(() => {
       fetchConnections();
-    }, 600000); 
-    
+    }, 600000);
+
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [refreshTrigger]); // Refresh every 15 seconds
   const handleRefresh = () => {
@@ -165,7 +165,7 @@ export default function ConnectionMapperPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to get explanation.');
-      
+
       // Update the state with the AI's response
       setExplanation(data.explanation);
 
@@ -224,10 +224,10 @@ export default function ConnectionMapperPage() {
             <AlertTitle>AI Security Analysis</AlertTitle>
             <AlertDescription>{aiSummary}</AlertDescription>
           </Alert>
-          
+
           {isLoading && <p>Loading active connections...</p>}
           {error && <p className="text-red-500">Error: {error}</p>}
-          
+
           {!isLoading && !error && (
             <Tabs defaultValue="map" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
@@ -240,7 +240,7 @@ export default function ConnectionMapperPage() {
                   Detailed List
                 </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="map" className="mt-4">
                 <div className="space-y-4">
                   {deviceLocation ? (
@@ -252,9 +252,9 @@ export default function ConnectionMapperPage() {
                           {devicePublicIP && <span className="ml-2 font-mono text-blue-600">({devicePublicIP})</span>}
                         </span>
                       </div>
-                      <div 
+                      <div
                         className="relative w-full"
-                        style={{ 
+                        style={{
                           height: '600px',
                           touchAction: 'none',
                           pointerEvents: 'auto',
@@ -263,7 +263,7 @@ export default function ConnectionMapperPage() {
                         onWheel={(e) => e.stopPropagation()}
                         onTouchMove={(e) => e.stopPropagation()}
                       >
-                        <GlobeVisualization 
+                        <GlobeVisualization
                           connections={globeConnections}
                           deviceIP={devicePublicIP || undefined}
                           deviceLat={deviceLocation.lat}
@@ -282,7 +282,7 @@ export default function ConnectionMapperPage() {
                   )}
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="list" className="mt-4">
                 <Accordion type="single" collapsible className="w-full">
                   {groupedConnections.map(({ name, pid, count, connections: connList }) => (
@@ -311,32 +311,32 @@ export default function ConnectionMapperPage() {
                                 <TableCell>{conn.country}</TableCell>
                                 <TableCell className="text-right space-x-2">
                                   {/* --- THIS IS THE UPDATED POPOVER UI --- */}
-                                <Popover onOpenChange={(isOpen) => !isOpen && setExplainingHostname(null)}>
-                                  <PopoverTrigger asChild>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      onClick={() => handleExplainConnection(conn.hostname)}
-                                      disabled={!conn.hostname || conn.hostname === 'N/A'}
-                                    >
-                                      <Info className="h-4 w-4" />
-                                    </Button>
-                                  </PopoverTrigger>
-                                  {/* Show the popover only for the hostname we are currently explaining */}
-                                  {explainingHostname === conn.hostname && (
-                                    <PopoverContent className="w-80">
-                                      <div className="grid gap-4">
-                                        <div className="space-y-2">
-                                          <h4 className="font-medium leading-none">AI Explanation</h4>
-                                          <p className="text-sm text-muted-foreground">
-                                            {explanation}
-                                          </p>
+                                  <Popover onOpenChange={(isOpen) => !isOpen && setExplainingHostname(null)}>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleExplainConnection(conn.hostname)}
+                                        disabled={!conn.hostname || conn.hostname === 'N/A'}
+                                      >
+                                        <Info className="h-4 w-4" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    {/* Show the popover only for the hostname we are currently explaining */}
+                                    {explainingHostname === conn.hostname && (
+                                      <PopoverContent className="w-80">
+                                        <div className="grid gap-4">
+                                          <div className="space-y-2">
+                                            <h4 className="font-medium leading-none">AI Explanation</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                              {explanation}
+                                            </p>
+                                          </div>
                                         </div>
-                                      </div>
-                                    </PopoverContent>
-                                  )}
-                                </Popover>
-                              </TableCell>
+                                      </PopoverContent>
+                                    )}
+                                  </Popover>
+                                </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>

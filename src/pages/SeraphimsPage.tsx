@@ -16,19 +16,19 @@ interface ModelResult {
 const SeraphimsPage: React.FC = () => {
   const { toast } = useToast();
   const [currentMetrics, setCurrentMetrics] = useState<any>(null);
-  
+
   const [anomalyResult, setAnomalyResult] = useState<ModelResult>({
     loading: false,
     error: null,
     data: null
   });
-  
+
   const [qualityResult, setQualityResult] = useState<ModelResult>({
     loading: false,
     error: null,
     data: null
   });
-  
+
   const [bottleneckResult, setBottleneckResult] = useState<ModelResult>({
     loading: false,
     error: null,
@@ -39,7 +39,7 @@ const SeraphimsPage: React.FC = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await fetch('http://localhost:3001/metrics');
+        const response = await fetch('https://pxmonitor.onrender.com/metrics');
         if (response.ok) {
           const data = await response.json();
           setCurrentMetrics(data);
@@ -51,7 +51,7 @@ const SeraphimsPage: React.FC = () => {
 
     fetchMetrics();
     const interval = setInterval(fetchMetrics, 5000); // Update every 5 seconds
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -68,7 +68,7 @@ const SeraphimsPage: React.FC = () => {
     setAnomalyResult({ loading: true, error: null, data: null });
 
     try {
-      const response = await fetch('http://localhost:3001/api/seraphims/anomaly', {
+      const response = await fetch('https://pxmonitor.onrender.com/api/seraphims/anomaly', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -81,10 +81,10 @@ const SeraphimsPage: React.FC = () => {
       });
 
       if (!response.ok) throw new Error('Failed to run model');
-      
+
       const result = await response.json();
       setAnomalyResult({ loading: false, error: null, data: result });
-      
+
       toast({
         title: "Anomaly Detection Complete",
         description: result.isAnomaly ? "⚠️ Anomaly detected!" : "✅ Network behavior is normal",
@@ -113,7 +113,7 @@ const SeraphimsPage: React.FC = () => {
     setQualityResult({ loading: true, error: null, data: null });
 
     try {
-      const response = await fetch('http://localhost:3001/api/seraphims/quality', {
+      const response = await fetch('https://pxmonitor.onrender.com/api/seraphims/quality', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,10 +125,10 @@ const SeraphimsPage: React.FC = () => {
       });
 
       if (!response.ok) throw new Error('Failed to run model');
-      
+
       const result = await response.json();
       setQualityResult({ loading: false, error: null, data: result });
-      
+
       toast({
         title: "Quality Prediction Complete",
         description: `Predicted streaming quality: ${result.quality}`,
@@ -156,7 +156,7 @@ const SeraphimsPage: React.FC = () => {
     setBottleneckResult({ loading: true, error: null, data: null });
 
     try {
-      const response = await fetch('http://localhost:3001/api/seraphims/bottleneck', {
+      const response = await fetch('https://pxmonitor.onrender.com/api/seraphims/bottleneck', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -169,10 +169,10 @@ const SeraphimsPage: React.FC = () => {
       });
 
       if (!response.ok) throw new Error('Failed to run model');
-      
+
       const result = await response.json();
       setBottleneckResult({ loading: false, error: null, data: result });
-      
+
       toast({
         title: "Bottleneck Detection Complete",
         description: `Congestion level: ${result.prediction}`,
@@ -191,9 +191,9 @@ const SeraphimsPage: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Seraphims - Machine Learning Models for Network Analysis</h1>
-        <ComponentExplanation 
-          componentName="AI Models" 
-          data={{ 
+        <ComponentExplanation
+          componentName="AI Models"
+          data={{
             modelCount: 3,
             features: ['Anomaly Detection', 'Quality Prediction', 'Congestion Analysis']
           }}
@@ -212,7 +212,7 @@ const SeraphimsPage: React.FC = () => {
                   <CardDescription className="text-gray-500 dark:text-gray-400">Identifies unusual network behavior.</CardDescription>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={runAnomalyModel}
                 disabled={anomalyResult.loading || !currentMetrics}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white"
@@ -246,7 +246,7 @@ const SeraphimsPage: React.FC = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             {anomalyResult.error && (
               <Alert className="border-red-500 bg-red-50 dark:bg-red-950">
                 <AlertDescription className="text-red-600 dark:text-red-400">
@@ -254,7 +254,7 @@ const SeraphimsPage: React.FC = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <Separator />
             <div>
               <h3 className="text-xl font-semibold flex items-center"><Lightbulb className="w-5 h-5 mr-2 text-blue-500" />Description</h3>
@@ -276,7 +276,7 @@ const SeraphimsPage: React.FC = () => {
                   <CardDescription className="text-gray-500 dark:text-gray-400">Estimates achievable video streaming quality.</CardDescription>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={runQualityModel}
                 disabled={qualityResult.loading || !currentMetrics}
                 className="bg-purple-500 hover:bg-purple-600 text-white"
@@ -306,7 +306,7 @@ const SeraphimsPage: React.FC = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             {qualityResult.error && (
               <Alert className="border-red-500 bg-red-50 dark:bg-red-950">
                 <AlertDescription className="text-red-600 dark:text-red-400">
@@ -314,7 +314,7 @@ const SeraphimsPage: React.FC = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <Separator />
             <div>
               <h3 className="text-xl font-semibold flex items-center"><Lightbulb className="w-5 h-5 mr-2 text-blue-500" />Description</h3>
@@ -336,7 +336,7 @@ const SeraphimsPage: React.FC = () => {
                   <CardDescription className="text-gray-500 dark:text-gray-400">Identifies the current level of network congestion.</CardDescription>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={runBottleneckModel}
                 disabled={bottleneckResult.loading || !currentMetrics}
                 className="bg-orange-500 hover:bg-orange-600 text-white"
@@ -356,14 +356,14 @@ const SeraphimsPage: React.FC = () => {
             {bottleneckResult.data && (
               <Alert className={
                 bottleneckResult.data.prediction === 'High' ? "border-red-500 bg-red-50 dark:bg-red-950" :
-                bottleneckResult.data.prediction === 'Moderate' ? "border-orange-500 bg-orange-50 dark:bg-orange-950" :
-                "border-green-500 bg-green-50 dark:bg-green-950"
+                  bottleneckResult.data.prediction === 'Moderate' ? "border-orange-500 bg-orange-50 dark:bg-orange-950" :
+                    "border-green-500 bg-green-50 dark:bg-green-950"
               }>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className={
                     bottleneckResult.data.prediction === 'High' ? "h-5 w-5 text-red-500" :
-                    bottleneckResult.data.prediction === 'Moderate' ? "h-5 w-5 text-orange-500" :
-                    "h-5 w-5 text-green-500"
+                      bottleneckResult.data.prediction === 'Moderate' ? "h-5 w-5 text-orange-500" :
+                        "h-5 w-5 text-green-500"
                   } />
                   <AlertDescription className="font-semibold">
                     Congestion Level: {bottleneckResult.data.prediction}
@@ -374,7 +374,7 @@ const SeraphimsPage: React.FC = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             {bottleneckResult.error && (
               <Alert className="border-red-500 bg-red-50 dark:bg-red-950">
                 <AlertDescription className="text-red-600 dark:text-red-400">
@@ -382,7 +382,7 @@ const SeraphimsPage: React.FC = () => {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <Separator />
             <div>
               <h3 className="text-xl font-semibold flex items-center"><Lightbulb className="w-5 h-5 mr-2 text-blue-500" />Description</h3>

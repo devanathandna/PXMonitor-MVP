@@ -34,7 +34,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await fetch('http://localhost:3001/metrics');
+        const response = await fetch('https://pxmonitor.onrender.com/metrics');
         if (response.ok) {
           const data = await response.json();
           setCurrentMetrics(data);

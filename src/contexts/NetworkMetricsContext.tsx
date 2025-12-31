@@ -35,10 +35,10 @@ export const NetworkMetricsProvider = ({ children }: { children: ReactNode }) =>
 
     const fetchData = async () => {
       if (!dataFetchingEnabled) return;
-      
+
       try {
         // Fetching from the correct '/metrics' endpoint as defined in index.js
-        const response = await fetch('/metrics');
+        const response = await fetch('https://pxmonitor.onrender.com/metrics');
         if (!response.ok) {
           // The backend sends 503 if data is not ready, which is expected.
           if (response.status === 503) {
