@@ -28,7 +28,7 @@ const server = createServer(app);
 
 // Add CORS middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5173'],
+    origin: '*',
     credentials: true
 }));
 
