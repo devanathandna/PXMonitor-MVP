@@ -118,7 +118,7 @@ const Settings = () => {
   const updateBackendDataControl = async () => {
     try {
       const state = dataControlStore.getState();
-      await fetch('/api/data-control', {
+      await fetch('https://pxmonitor.onrender.com/api/data-control', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ const Settings = () => {
     const unsubscribe = dataControlStore.subscribe((state) => {
       setDataControlState(state);
       // Update the settings groups to reflect the new state
-      setSettingsGroups(prevGroups => 
+      setSettingsGroups(prevGroups =>
         prevGroups.map(group => {
           if (group.id === "data-control") {
             return {
@@ -175,7 +175,7 @@ const Settings = () => {
     const darkModeSetting = settingsGroups
       .find(group => group.id === "general")
       ?.settings.find(setting => setting.id === "theme")?.value;
-      
+
     if (darkModeSetting) {
       document.documentElement.classList.add("dark");
       document.documentElement.classList.remove("light");
@@ -189,7 +189,7 @@ const Settings = () => {
   const isDarkMode = settingsGroups
     .find(group => group.id === "general")
     ?.settings.find(setting => setting.id === "theme")?.value || false;
-    
+
   const showNotifications = settingsGroups
     .find(group => group.id === "general")
     ?.settings.find(setting => setting.id === "notifications")?.value || false;
@@ -198,13 +198,13 @@ const Settings = () => {
   const dashboardDataEnabled = settingsGroups
     .find(group => group.id === "data-control")
     ?.settings.find(setting => setting.id === "dashboard-data")?.value || true;
-    
+
   const systemMonitorDataEnabled = settingsGroups
     .find(group => group.id === "data-control")
     ?.settings.find(setting => setting.id === "system-monitor-data")?.value || true;
 
   const handleSettingChange = (groupId: string, settingId: string, newValue: boolean | number | string) => {
-    setSettingsGroups(prevGroups => 
+    setSettingsGroups(prevGroups =>
       prevGroups.map(group => {
         if (group.id === groupId) {
           return {
@@ -222,7 +222,7 @@ const Settings = () => {
                     document.documentElement.classList.add("light");
                   }
                 }
-                
+
                 // Handle data control settings - update global state and backend
                 if (settingId === "dashboard-data") {
                   dataControlStore.setDashboardEnabled(newValue as boolean);
@@ -231,7 +231,7 @@ const Settings = () => {
                   dataControlStore.setSystemMonitorEnabled(newValue as boolean);
                   updateBackendDataControl();
                 }
-                
+
                 return { ...setting, value: newValue };
                 if (settingId === "dashboard-data" || settingId === "system-monitor-data") {
                   window.dispatchEvent(new CustomEvent('dataControlChanged', {
@@ -241,7 +241,7 @@ const Settings = () => {
                     }
                   }));
                 }
-                
+
                 return { ...setting, value: newValue };
               }
               return setting;
@@ -256,18 +256,18 @@ const Settings = () => {
   const saveSettings = () => {
     // Save settings to local storage
     localStorage.setItem('pxmonitor-settings', JSON.stringify(settingsGroups));
-    
+
     // Send the settings to the parent app via window event
-    window.dispatchEvent(new CustomEvent('settingsUpdated', { 
-      detail: { 
+    window.dispatchEvent(new CustomEvent('settingsUpdated', {
+      detail: {
         darkMode: isDarkMode,
         showNotifications,
         dashboardDataEnabled,
         systemMonitorDataEnabled,
         settingsGroups
-      } 
+      }
     }));
-    
+
     // Show a success message
     toast.success("Settings saved successfully");
   };
@@ -279,7 +279,7 @@ const Settings = () => {
 
   const renderSetting = (group: SettingsGroup, setting: Setting) => {
     const { id, name, description, type, value, options, min, max, unit } = setting;
-    
+
     switch (type) {
       case "toggle":
         return (
@@ -295,7 +295,7 @@ const Settings = () => {
             />
           </div>
         );
-        
+
       case "slider":
         return (
           <div>
@@ -325,7 +325,7 @@ const Settings = () => {
             </div>
           </div>
         );
-        
+
       case "input":
         return (
           <div>
@@ -346,7 +346,7 @@ const Settings = () => {
             </div>
           </div>
         );
-        
+
       case "dropdown":
         return (
           <div>
@@ -375,7 +375,7 @@ const Settings = () => {
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-muted-foreground">Customize your PXMonitor experience</p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {settingsGroups.map(group => (
           <div key={group.id} className="network-card">
@@ -390,17 +390,17 @@ const Settings = () => {
           </div>
         ))}
       </div>
-      
+
       <div className="flex justify-between mt-6">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={handleExportSettings}
           className="flex items-center gap-2"
         >
           <Download size={16} />
           Export Settings
         </Button>
-        <Button 
+        <Button
           className="glow-button"
           onClick={saveSettings}
         >

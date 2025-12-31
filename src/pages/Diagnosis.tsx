@@ -47,7 +47,7 @@ const Diagnosis = () => {
   useEffect(() => {
     const fetchInitialMetrics = async () => {
       try {
-        const response = await fetch('/metrics');
+        const response = await fetch('https://pxmonitor.onrender.com/metrics');
         if (!response.ok) {
           throw new Error(`API call failed: ${response.status}`);
         }
@@ -145,7 +145,7 @@ const Diagnosis = () => {
 
     try {
       // 1. Execute the script
-      const scriptResponse = await fetch(`/api/run-script/${script.fileName}`, {
+      const scriptResponse = await fetch(`https://pxmonitor.onrender.com/api/run-script/${script.fileName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const Diagnosis = () => {
         });
 
         // Still update metrics to show some change
-        const metricsResponse = await fetch('/metrics');
+        const metricsResponse = await fetch('https://pxmonitor.onrender.com/metrics');
         if (metricsResponse.ok) {
           const updatedMetrics = await metricsResponse.json();
 
@@ -211,7 +211,7 @@ const Diagnosis = () => {
       }
 
       // 2. Fetch fresh metrics to get the "after" state (Full version)
-      const metricsResponse = await fetch('/metrics');
+      const metricsResponse = await fetch('https://pxmonitor.onrender.com/metrics');
       if (!metricsResponse.ok) {
         throw new Error('Failed to fetch updated metrics after script execution.');
       }

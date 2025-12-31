@@ -106,14 +106,14 @@ export default function SystemMonitor() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const FETCH_INTERVAL_MS = 10000; // 10 seconds
   const [chatScrollPct, setChatScrollPct] = useState(100); // 0..100 (0 = top, 100 = bottom)
-  const scrollbarRef = useRef<HTMLInputElement|null>(null);
+  const scrollbarRef = useRef<HTMLInputElement | null>(null);
   const fetchSystemData = useCallback(async () => {
     if (!dataControlState.systemMonitorEnabled) return;
-    
+
     try {
       const [procRes, healthRes] = await Promise.all([
-        fetch("/api/system/processes"),
-        fetch("/api/system/health"),
+        fetch("https://pxmonitor.onrender.com/api/system/processes"),
+        fetch("https://pxmonitor.onrender.com/api/system/health"),
       ]);
 
       if (!procRes.ok) throw new Error(`Processes fetch failed: ${procRes.statusText}`);
@@ -167,10 +167,10 @@ export default function SystemMonitor() {
     setQuestion(""); // Clear input immediately
     const recentHistory = chatHistory.slice(-3);
     try {
-      const res = await fetch("/api/system/analyze", {
+      const res = await fetch("https://pxmonitor.onrender.com/api/system/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, context: { health, processes },history: recentHistory }),
+        body: JSON.stringify({ question, context: { health, processes }, history: recentHistory }),
       });
 
       if (!res.ok) throw new Error(`AI fetch failed: ${res.statusText}`);
@@ -221,23 +221,23 @@ export default function SystemMonitor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                    <h3 className="font-bold mb-2">Disk I/O</h3>
-                    {health.disks.map(disk => (
-                        <div key={disk.name} className="flex justify-between items-center">
-                            <span>{disk.name} (Used: {disk.usedPercent}%)</span>
-                            <span className="text-xs">R: {disk.readSpeedMBs} MB/s | W: {disk.writeSpeedMBs} MB/s</span>
-                        </div>
-                    ))}
+                  <h3 className="font-bold mb-2">Disk I/O</h3>
+                  {health.disks.map(disk => (
+                    <div key={disk.name} className="flex justify-between items-center">
+                      <span>{disk.name} (Used: {disk.usedPercent}%)</span>
+                      <span className="text-xs">R: {disk.readSpeedMBs} MB/s | W: {disk.writeSpeedMBs} MB/s</span>
+                    </div>
+                  ))}
                 </div>
                 <div>
-                    <h3 className="font-bold mb-2">Key Services</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {health.keyServices.map(service => (
-                            <Badge key={service.name} variant={service.status === 'Running' ? 'default' : 'destructive'}>
-                                {service.name}
-                            </Badge>
-                        ))}
-                    </div>
+                  <h3 className="font-bold mb-2">Key Services</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {health.keyServices.map(service => (
+                      <Badge key={service.name} variant={service.status === 'Running' ? 'default' : 'destructive'}>
+                        {service.name}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -262,7 +262,7 @@ export default function SystemMonitor() {
                   <tr key={p.pid} className="border-b">
                     <td className="p-2">{p.pid}</td>
                     <td className="p-2">{p.name}</td>
-                     <td className="p-2">
+                    <td className="p-2">
                       {typeof p.cpu === 'number' ? p.cpu.toFixed(1) : "-"}
                     </td>
                     <td className="p-2">
@@ -286,11 +286,11 @@ export default function SystemMonitor() {
           {/* --- ATTACH REF HERE for auto-scrolling --- */}
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto mb-2 space-y-4 p-2">
             {chatHistory.map((m, i) => (
-                <div key={i} className="w-full">
+              <div key={i} className="w-full">
                 <ChatBubble key={i} text={m.text} role={m.role} />
-                </div>
+              </div>
             ))}
-          
+
             {/* --- ADD THIS to show a "thinking" message --- */}
             {isAiThinking && (
               <div className="flex items-start">
@@ -320,11 +320,11 @@ export default function SystemMonitor() {
 
       {/* Data Disabled Overlay */}
       {!dataControlState.systemMonitorEnabled && (
-        <DataDisabledOverlay 
-          type="system-monitor" 
+        <DataDisabledOverlay
+          type="system-monitor"
           onEnable={() => {
             // Refresh will happen automatically through data control store subscription
-          }} 
+          }}
         />
       )}
     </div>

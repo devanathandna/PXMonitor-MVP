@@ -158,7 +158,7 @@ export default function ConnectionMapperPage() {
     setExplanation("AI is analyzing this connection...");
 
     try {
-      const res = await fetch("/api/connections/explain", {
+      const res = await fetch("https://pxmonitor.onrender.com/api/connections/explain", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hostname }),
@@ -183,7 +183,7 @@ export default function ConnectionMapperPage() {
     setIsScanning(true);
     setAiSummary("AI is scanning your connections for security risks...");
     try {
-      const res = await fetch("/api/connections/security-scan", {
+      const res = await fetch("https://pxmonitor.onrender.com/api/connections/security-scan", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ connections }),
